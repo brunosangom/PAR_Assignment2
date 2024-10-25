@@ -1,6 +1,10 @@
 certifi==2024.8.30
 charset-normalizer==3.4.0
 idna==3.10
+inquirerpy==0.3.4
+pfzy==0.3.4
 planutils==0.10.15
+prompt_toolkit==3.0.48
 requests==2.32.3
 urllib3==2.2.3
+wcwidth==0.2.13

@@ -3,12 +3,10 @@ GREEN  := $(shell tput -Txterm setaf 2)
 YELLOW := $(shell tput -Txterm setaf 3)
 RESET  := $(shell tput -Txterm sgr0)
 
-.PHONY: all setup-env install-planutils install-singularity help
-
+.PHONY: all setup-env install-planutils help
 # all: setup-env install-planutils install-singularity
 
 all: help
-
 
 ## Setup Python environment
 setup-env: ## Create a Python virtual environment and install dependencies.
@@ -31,7 +29,6 @@ install-planutils: setup-env ## Install Planutils in the virtual environment. =>
 	echo "Installing Planutils..."; \
 	pip install planutils; \
 	planutils install -y optic downward delfi ff lama metric-ff dual-bfws-ffparser enhsp tfd
- 
 
 ## Show help
 help: ## Show this help.
