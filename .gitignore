@@ -1,0 +1,81 @@
+# Python 
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+.venv/
+venv/
+ENV/
+env/
+*.log
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+bin/
+lib/
+lib64/
+include/
+local/
+*.env
+.venv/
+
+# LaTeX auxiliary files
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+*~.backup
+
+# Intermediate and output files
+*.blg
+*.bbl
+*.run.xml
+*.fdb_latexmk
+*.snm
+*.nav
+*.vrb
+
+# PDFLaTeX and dvipdfmx output files
+*.pdf
+*.dvi
+*.ps
+*.eps
+
+# XeLaTeX and LuaLaTeX intermediate files
+*.xdv
+
+# Editor backup and temporary files
+*~
+*.swp
+*.swo
+.*.swp
+.*.swo
+Thumbs.db
+.DS_Store
+
+# Miscellaneous
+*.bak
+*.synctex.gz
+*.loc
+*.lol
+
+# Planutils and Singularity
+planutils/
+*.sif
