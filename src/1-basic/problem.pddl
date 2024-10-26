@@ -4,19 +4,20 @@
     (:objects
         storage-room preparation-room cooking-room serving-room dishwashing-room cutting-room mixing-room - room
         sushi - dish
-        knife - tool
+        knife spoon - tool
         rice fish vegetable - ingredient
         chef - robot
     )
 
     (:init
         ;; Initial room of the robot
-        (robot-at chef cooking-room)
+        (at chef cooking-room)
+        (hand-free)
 
         ;; Ingredients in the storage
-        (ingredient-at rice storage-room)
-        (ingredient-at fish storage-room)
-        (ingredient-at vegetable storage-room)
+        (at rice storage-room)
+        (at fish storage-room)
+        (at vegetable storage-room)
 
         ;; Fluent ingredient quantities
         (= (ingredient-quantity rice) 1)
@@ -27,7 +28,6 @@
         (ingredient-prep-room rice mixing-room); Rice must be prepared in Mixing room
         (ingredient-prep-room fish cutting-room); Fish must be cut in Cutting room
         (ingredient-prep-room vegetable cutting-room); Vegetables must be cut in Cutting room
-        (ingredient-cook-room rice cooking-room); Rice must be cooked in Cooking room
 
         ;; Bind dishes to ingredients
         (ingredient-used-in-dish rice sushi)
@@ -49,8 +49,12 @@
         (is-mixing-room mixing-room)
 
         ;; Tool setup
-        (tool-at knife dishwashing-room)
+        (tool-use-room knife cutting-room)
+        (tool-use-room spoon mixing-room)
+        (at knife cutting-room)
+        (at spoon mixing-room)
         (tool-clean knife)
+        (tool-clean spoon)
 
         ;; Adjacency between rooms
         (adjacent serving-room cooking-room)

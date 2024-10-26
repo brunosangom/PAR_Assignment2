@@ -1,11 +1,12 @@
 (define (domain robot_chef)
-    (:requirements :strips :typing :fluents :negative-preconditions :disjunctive-preconditions)
+    (:requirements :strips :typing :fluents :negative-preconditions :disjunctive-preconditions :conditional-effects)
 
     ;; Define types and type hierarchy
     (:types
-        robot; Define a type for the robot
-        room; Define a type for locations/rooms
-        item; Define a general type 'item' for anything the robot might hold
+        room - object; Define a type for locations/rooms
+        movable - object; Define a type for movable objects
+        robot - movable; Define a type for the robot
+        item - movable; Define a general type 'item' for anything the robot might hold
         ingredient tool dish - item; 'ingredient', 'tool', and 'dish' are subtypes of 'item'
         )
 
@@ -15,17 +16,16 @@
 
     (:predicates
         ;; Basic predicates
-        (robot-at ?r - robot ?room - room); The robot is in a specific room.
+        (at ?movable - movable ?room - room); A movable object is in a specific room.
+
         (holding ?item - item); The robot is holding an item.
+        (hand-free); The robot hand is free
         (adjacent ?room1 - room ?room2 - room); The rooms are adjacent.
 
-        (tool-at ?tool - tool ?room - room); A tool is in a specific room.
         (tool-clean ?tool - tool); A tool is clean.
 
-        (dish-at ?dish - dish ?room - room); A dish is in a specific room.
         (dish-prepared ?dish - dish); The dish is fully prepared.
 
-        (ingredient-at ?ingredient - ingredient ?room - room); An ingredient is in a specific room.
         (ingredient-prepared ?ingredient - ingredient); The ingredient is prepared .
         (ingredient-cooked ?ingredient - ingredient); The ingredient is cooked.
 
@@ -37,10 +37,10 @@
         (is-cutting-room ?room - room); The room is the cutting room.
         (is-mixing-room ?room - room); The room is the mixing room.
 
-        ;; Helpers to bind specific ingredients to rooms
+        ;; Helpers to bind specific items to rooms
+        (tool-use-room ?tool -tool ?room -room); A tool is used in a specific room.
         (ingredient-prep-room ?ingredient - ingredient ?room - room); Ingredient must be prepared in a specific room.
-        (ingredient-cook-room ?ingredient - ingredient ?room - room); Ingredient must be cooked in a specific room.
-
+        
         ;; Requirements between dishes and ingredients (define recipe)
         (ingredient-used-in-dish ?ingredient - ingredient ?dish - dish) ;; Link ingredient to a specific dish
         (require-prepared ?dish - dish ?ingredient - ingredient); The dish requires a prepared ingredient.
@@ -53,43 +53,92 @@
     (:action move
         :parameters (?robot - robot ?from - room ?to - room)
         :precondition (and
-            (robot-at ?robot ?from)
+            (at ?robot ?from)
             (adjacent ?from ?to)
         )
         :effect (and
-            (robot-at ?robot ?to)
-            (not (robot-at ?robot ?from))
+            (at ?robot ?to)
+            (not (at ?robot ?from))
         )
     )
 
-    ;; The robot picks up an ingredient from the storage area.
+    ;; The robot picks up a tool.
+    (:action pick-up-tool
+        :parameters (?robot - robot ?tool - tool ?room - room)
+        :precondition (and
+            (at ?robot ?room)
+            (at ?tool ?room)
+            (hand-free); Verify that the robot does not already hold something (limited to 1).
+        )
+        :effect (and
+            (holding ?tool)
+            (not (hand-free))
+            (not (at ?tool ?room))
+        )
+    )
+
+    ;; The robot picks up an ingredient from the storage room.
     (:action pick-up-ingredient
         :parameters (?robot - robot ?ingredient - ingredient ?room - room)
         :precondition (and
-            (robot-at ?robot ?room)
-            (ingredient-at ?ingredient ?room)
-            (not (holding ?ingredient)); Verify that the robot does not already hold something (limited to 1).
-            (is-storage-room ?room); ingredients are only in the storage room.
-            (> (ingredient-quantity ?ingredient) 0); The quantity of ingredient must be more than 0.
+            (at ?robot ?room)
+            (at ?ingredient ?room)
+            (hand-free); Verify that the robot does not already hold something (limited to 1).
+            (imply (is-storage-room ?room) (> (ingredient-quantity ?ingredient) 0)); If picking up from the storage, the quantity of ingredient must be more than 0.
         )
         :effect (and
             (holding ?ingredient)
-            (not (ingredient-at ?ingredient ?room))
-            (decrease (ingredient-quantity ?ingredient) 1) ;; Decrease the quantity of the picked-up ingredient.
+            (not (hand-free))
+            (not (at ?ingredient ?room))
+            (when (is-storage-room ?room) (decrease (ingredient-quantity ?ingredient) 1)) ;; Decrease the quantity of the picked-up ingredient.
+        )
+    )
+
+    ;; The robot drops a tool in its use room.
+    (:action drop-tool
+        :parameters (?robot - robot ?tool - tool ?room - room)
+        :precondition (and
+            (at ?robot ?room)
+            (holding ?tool)
+            (tool-use-room ?tool ?room)
+        )
+        :effect (and
+            (not (holding ?tool))
+            (hand-free)
+            (at ?tool ?room)
+        )
+    )
+
+    ;; The robot drops an ingredient in a room, which can only be the prep room of the ingredient or the preparation room.
+    (:action drop-ingredient
+        :parameters (?robot - robot ?ingredient - ingredient ?room - room)
+        :precondition (and
+            (at ?robot ?room)
+            (holding ?ingredient)
+            (or (ingredient-prep-room ?ingredient ?room) (is-preparation-room ?room))
+        )
+        :effect (and
+            (not (holding ?ingredient))
+            (hand-free)
+            (at ?ingredient ?room)
         )
     )
 
     ;; The robot prepares an ingredient (e.g., cuts, mixes) in the appropriate room.
     (:action prepare-ingredient
-        :parameters (?robot - robot ?ingredient - ingredient ?room - room)
+        :parameters (?robot - robot ?ingredient - ingredient ?tool -tool ?room - room)
         :precondition (and
-            (robot-at ?robot ?room)
+            (at ?robot ?room)
             (ingredient-prep-room ?ingredient ?room); The ingredient must be prepared in the specified room.
-            (holding ?ingredient); The robot must hold the ingredient to prepare it.
+            (at ?ingredient ?room); The robot must hold the ingredient to prepare it.
+            (holding ?tool)
+            (tool-use-room ?tool ?room)
+            (tool-clean ?tool)
             ;(not (ingredient-prepared ?ingredient)); The ingredient must not be already prepared.
         )
         :effect (and
             (ingredient-prepared ?ingredient)
+            (not (tool-clean ?tool))
         )
     )
 
@@ -98,8 +147,7 @@
         :parameters (?robot - robot ?ingredient - ingredient ?room - room)
         :precondition (and
             (is-cooking-room ?room)
-            (robot-at ?robot ?room)
-            (ingredient-cook-room ?ingredient ?room); The ingredient must be cooked in the specified room.
+            (at ?robot ?room)
             (ingredient-prepared ?ingredient); The ingredient must be prepared before cooking.
             (holding ?ingredient); The robot must hold the ingredient to cook it.
             ;(not (ingredient-cooked ?ingredient)); The ingredient must not be already cooked.
@@ -113,7 +161,7 @@
     (:action assemble-dish
         :parameters (?r - robot ?dish - dish ?room - room)
         :precondition (and
-            (robot-at ?r ?room)
+            (at ?r ?room)
             (is-preparation-room ?room)
             ;; Precondition to ensure all ingredients are either prepared or cooked as required
             (forall
@@ -138,13 +186,17 @@
     ; )
 
     ;; The robot cleans a tool in the dishwashing area.
-    ; (:action clean-tool
-    ;     :parameters ()
-    ;     :precondition (and
+    (:action clean-tool
+        :parameters (?robot -robot ?tool - tool ?room - room)
+        :precondition (and
+                (at ?robot ?room)
+                (is-dishwashing-room ?room)
+                (holding ?tool)
+                (not (tool-clean ?tool))
 
-    ;     )
-    ;     :effect (and
-
-    ;     )
-    ; ))
+        )
+        :effect (and
+                (tool-clean ?tool)
+        )
+    )
 )
