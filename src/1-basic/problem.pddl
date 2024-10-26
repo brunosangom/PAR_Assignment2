@@ -78,9 +78,7 @@
 
     (:goal
         (and
-            (dish-prepared sushi)
-            ; (dish-at sushi serving-room)
-            ; (tool-clean knife)
+            (dish-served sushi)
         )
 
     )
