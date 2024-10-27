@@ -7,13 +7,20 @@ def list_planners():
     return [
         # "optic", Does not support ADL
         # "downward", Does not support Fluents
-        "delfi",
+        # "delfi",
         # "ff", Does not support Fluents
         # "lama",
-        "metric-ff",
+        # "metric-ff",
         "dual-bfws-ffparser",
-        "enhsp",
-        "tfd",
+        # "enhsp",
+        # "tfd",
+        # "ipc2023_spock",
+        # "kstar",
+        # "pyperplan",
+        # "smtplan",
+        # "popf",
+        "enhsp-2020",
+        "lpg-td",
     ]
 
 
@@ -29,8 +36,13 @@ def find_pddl_directories(src_path):
 
 
 def run_planner(planner, domain_file, problem_file):
-    command = f"planutils run {planner} {domain_file} {problem_file}"
-    print(f"Executing command: {command}")
+
+    if planner == "enhsp-2020":
+        command = (
+            f"planutils run {planner} --domain {domain_file} --problem {problem_file}"
+        )
+    else:
+        command = f"planutils run {planner} {domain_file} {problem_file}"
 
     try:
         result = subprocess.run(command, shell=True, text=True, capture_output=True)

@@ -1,5 +1,5 @@
 (define (domain robot_chef)
-    (:requirements :strips :typing :fluents :negative-preconditions :disjunctive-preconditions :conditional-effects :universal-preconditions)
+    (:requirements :strips :typing :negative-preconditions :disjunctive-preconditions :conditional-effects :universal-preconditions)
 
     ;; Define types and type hierarchy
     (:types
@@ -9,10 +9,6 @@
         item - movable; Define a general type 'item' for anything the robot might hold
         ingredient tool dish - item; 'ingredient', 'tool', and 'dish' are subtypes of 'item'
         )
-
-    (:functions
-        (ingredient-quantity ?i - ingredient) ;; Fluents for managing the quantity of each ingredient.
-    )
 
     (:predicates
         ;; Basic predicates
@@ -42,11 +38,13 @@
         ;; Helpers to bind specific items to rooms
         (tool-use-room ?tool -tool ?room -room); A tool is used in a specific room.
         (ingredient-prep-room ?ingredient - ingredient ?room - room); Ingredient must be prepared in a specific room.
-        
+
         ;; Requirements between dishes and ingredients (define recipe)
         (ingredient-used-in-dish ?ingredient - ingredient ?dish - dish) ;; Link ingredient to a specific dish
         (require-prepared ?dish - dish ?ingredient - ingredient); The dish requires a prepared ingredient.
         (require-cooked ?dish - dish ?ingredient - ingredient); The dish requires a cooked ingredient.
+
+        (is-free-ingredient ?ingredient - ingredient); The ingredient is free to use (not already used).
     )
 
     ; Actions
@@ -86,13 +84,11 @@
             (at ?robot ?room)
             (at ?ingredient ?room)
             (hand-free); Verify that the robot does not already hold something (limited to 1).
-            (imply (is-storage-room ?room) (> (ingredient-quantity ?ingredient) 0)); If picking up from the storage, the quantity of ingredient must be more than 0.
+            (is-free-ingredient ?ingredient)
         )
         :effect (and
             (holding ?ingredient)
             (not (hand-free))
-            (not (at ?ingredient ?room))
-            (when (is-storage-room ?room) (decrease (ingredient-quantity ?ingredient) 1)) ;; Decrease the quantity of the picked-up ingredient.
         )
     )
 
@@ -184,8 +180,12 @@
             (forall
                 (?ingredient - ingredient)
                 (and
-                    (imply (and (ingredient-used-in-dish ?ingredient ?dish) (require-prepared ?dish ?ingredient)) (and (ingredient-prepared ?ingredient) (at ?ingredient ?room)))
-                    (imply (and (ingredient-used-in-dish ?ingredient ?dish) (require-cooked ?dish ?ingredient)) (and (ingredient-cooked ?ingredient) (at ?ingredient ?room)))
+                    (imply
+                        (and (ingredient-used-in-dish ?ingredient ?dish) (require-prepared ?dish ?ingredient))
+                        (and (ingredient-prepared ?ingredient) (at ?ingredient ?room)))
+                    (imply
+                        (and (ingredient-used-in-dish ?ingredient ?dish) (require-cooked ?dish ?ingredient))
+                        (and (ingredient-cooked ?ingredient) (at ?ingredient ?room)))
                 )
             )
         )
@@ -203,12 +203,19 @@
             (at ?robot ?room)
             (holding ?dish)
             (dish-prepared ?dish)
-            (forall (?other_dish - dish)
-                    (imply (prioritize-dish ?other_dish ?dish) (dish-served ?other_dish))
+            (forall
+                (?other_dish - dish)
+                (imply
+                    (prioritize-dish ?other_dish ?dish)
+                    (dish-served ?other_dish))
             )
         )
         :effect (and
             (dish-served ?dish)
+            (forall
+                (?ingredient - ingredient)
+                (not (is-free-ingredient ?ingredient))
+            )
         )
     )
 
@@ -216,14 +223,13 @@
     (:action clean-tool
         :parameters (?robot -robot ?tool - tool ?room - room)
         :precondition (and
-                (at ?robot ?room)
-                (is-dishwashing-room ?room)
-                (holding ?tool)
-                (not (tool-clean ?tool))
-
+            (at ?robot ?room)
+            (is-dishwashing-room ?room)
+            (holding ?tool)
+            (not (tool-clean ?tool))
         )
         :effect (and
-                (tool-clean ?tool)
+            (tool-clean ?tool)
         )
     )
 )

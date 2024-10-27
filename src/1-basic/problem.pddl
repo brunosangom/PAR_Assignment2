@@ -20,9 +20,9 @@
         (at vegetable storage-room)
 
         ;; Fluent ingredient quantities
-        (= (ingredient-quantity rice) 1)
-        (= (ingredient-quantity fish) 1)
-        (= (ingredient-quantity vegetable) 1)
+        (is-free-ingredient fish)
+        (is-free-ingredient rice)
+        (is-free-ingredient vegetable)
 
         ;; Bind ingredients to specific prep/cooking room
         (ingredient-prep-room rice mixing-room); Rice must be prepared in Mixing room
