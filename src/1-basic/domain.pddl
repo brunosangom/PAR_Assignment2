@@ -147,6 +147,7 @@
             (holding ?tool)
             (tool-use-room ?tool ?room)
             (tool-clean ?tool)
+            (is-free-ingredient ?ingredient)
             ;(not (ingredient-prepared ?ingredient)); The ingredient must not be already prepared.
         )
         :effect (and
@@ -161,6 +162,7 @@
         :precondition (and
             (is-cooking-room ?room)
             (at ?robot ?room)
+            (is-free-ingredient ?ingredient)
             (ingredient-prepared ?ingredient); The ingredient must be prepared before cooking.
             (holding ?ingredient); The robot must hold the ingredient to cook it.
             ;(not (ingredient-cooked ?ingredient)); The ingredient must not be already cooked.
@@ -186,6 +188,7 @@
                     (imply
                         (and (ingredient-used-in-dish ?ingredient ?dish) (require-cooked ?dish ?ingredient))
                         (and (ingredient-cooked ?ingredient) (at ?ingredient ?room)))
+                    (is-free-ingredient ?ingredient)
                 )
             )
         )

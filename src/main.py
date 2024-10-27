@@ -6,9 +6,9 @@ import subprocess
 def list_planners():
     return [
         # "optic", Does not support ADL
-        # "downward", Does not support Fluents
+        # "downward",
         # "delfi",
-        # "ff", Does not support Fluents
+        # "ff",
         # "lama",
         # "metric-ff",
         "dual-bfws-ffparser",
@@ -19,8 +19,8 @@ def list_planners():
         # "pyperplan",
         # "smtplan",
         # "popf",
-        "enhsp-2020",
-        "lpg-td",
+        # "enhsp-2020",
+        # "lpg-td",
     ]
 
 
