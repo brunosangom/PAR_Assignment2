@@ -45,7 +45,7 @@
         (ingredient-used-in-dish ?ingredient - ingredient ?dish - dish) ;; Link ingredient to a specific dish
         (require-prepared ?dish - dish ?ingredient - ingredient); The dish requires a prepared ingredient.
         (require-cooked ?dish - dish ?ingredient - ingredient); The dish requires a cooked ingredient.
-        ; (next-dish ?dish - dish); The dish is currently being cooked
+        (next-dish ?dish - dish); The dish is currently being cooked
     )
 
     ; Actions
@@ -86,7 +86,7 @@
             (is-storage-room ?room)
             (ingredient-stored ?ingredient)
             (hand-free)
-            ; (next-dish ?dish)
+            (next-dish ?dish)
             (ingredient-used-in-dish ?ingredient ?dish)
         )
         :effect (and
@@ -220,7 +220,7 @@
             (at ?robot ?room)
             (holding ?dish)
             (dish-prepared ?dish)
-            ; (next-dish ?dish)
+            (next-dish ?dish)
             (forall
                 (?other_dish - dish)
                 (imply
@@ -232,14 +232,14 @@
             (dish-served ?dish)
             (not (holding ?dish))
             (hand-free)
-            ; (not (next-dish ?dish))
-            ; (forall 
-            ;     (?other_dish - dish)
-            ;     (when 
-            ;         (prioritize-dish ?dish ?other_dish)
-            ;         (next-dish ?other_dish)
-            ;     )
-            ; )
+            (not (next-dish ?dish))
+            (forall 
+                (?other_dish - dish)
+                (when 
+                    (prioritize-dish ?dish ?other_dish)
+                    (next-dish ?other_dish)
+                )
+            )
         )
     )
 

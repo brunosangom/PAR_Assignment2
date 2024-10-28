@@ -42,7 +42,7 @@
         (require-cooked ramen noodles)
         (require-cooked ramen broth)
 
-        ; (next-dish sushi)
+        (next-dish sushi)
         (prioritize-dish sushi ramen)
 
         ;; Set each room with a predicate
