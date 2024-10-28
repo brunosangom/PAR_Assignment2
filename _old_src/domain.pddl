@@ -24,6 +24,8 @@
         (dish-prepared ?dish - dish); The dish is fully prepared.
         (dish-served ?dish - dish); The dish is served
 
+        (ingredient-stored ?ingredient - ingredient); The ingredient is in the storage.
+        (ingredient-available ?ingredient - ingredient); The ingredient is available in the kitchen.
         (ingredient-prepared ?ingredient - ingredient); The ingredient is prepared .
         (ingredient-cooked ?ingredient - ingredient); The ingredient is cooked.
 
@@ -43,8 +45,7 @@
         (ingredient-used-in-dish ?ingredient - ingredient ?dish - dish) ;; Link ingredient to a specific dish
         (require-prepared ?dish - dish ?ingredient - ingredient); The dish requires a prepared ingredient.
         (require-cooked ?dish - dish ?ingredient - ingredient); The dish requires a cooked ingredient.
-
-        (is-free-ingredient ?ingredient - ingredient); The ingredient is free to use (not already used).
+        ; (next-dish ?dish - dish); The dish is currently being cooked
     )
 
     ; Actions
@@ -62,48 +63,51 @@
         )
     )
 
-    ;; The robot picks up a tool.
-    (:action pick-up-tool
-        :parameters (?robot - robot ?tool - tool ?room - room)
+    ;; The robot picks up an item.
+    (:action pick-up
+        :parameters (?robot - robot ?item - item ?room - room)
         :precondition (and
             (at ?robot ?room)
-            (at ?tool ?room)
+            (at ?item ?room)
             (hand-free); Verify that the robot does not already hold something (limited to 1).
         )
         :effect (and
-            (holding ?tool)
+            (holding ?item)
             (not (hand-free))
-            (not (at ?tool ?room))
+            (not (at ?item ?room))
         )
     )
 
-    ;; The robot picks up an ingredient.
-    (:action pick-up-ingredient
-        :parameters (?robot - robot ?ingredient - ingredient ?room - room)
+    ;; The robot takes an ingredient from the storage.
+    (:action take-from-storage
+        :parameters (?robot - robot ?ingredient - ingredient ?dish - dish ?room - room)
         :precondition (and
             (at ?robot ?room)
-            (at ?ingredient ?room)
-            (hand-free); Verify that the robot does not already hold something (limited to 1).
-            (is-free-ingredient ?ingredient)
+            (is-storage-room ?room)
+            (ingredient-stored ?ingredient)
+            (hand-free)
+            ; (next-dish ?dish)
+            (ingredient-used-in-dish ?ingredient ?dish)
         )
         :effect (and
             (holding ?ingredient)
+            (ingredient-available ?ingredient)
             (not (hand-free))
+            (not (ingredient-stored ?ingredient))
         )
     )
 
-    ;; The robot picks up a dish.
-    (:action pick-up-dish
-        :parameters (?robot - robot ?dish - dish ?room - room)
+    ;; The robot buys an ingredient.
+    (:action buy-ingredient
+        :parameters (?robot - robot ?ingredient - ingredient ?room - room)
         :precondition (and
             (at ?robot ?room)
-            (at ?dish ?room)
-            (hand-free); Verify that the robot does not already hold something (limited to 1).
+            (is-storage-room ?room)
+            (not (ingredient-stored ?ingredient))
+            (not (ingredient-available ?ingredient))
         )
         :effect (and
-            (holding ?dish)
-            (not (hand-free))
-            (not (at ?dish ?room))
+            (ingredient-stored ?ingredient)
         )
     )
 
@@ -128,7 +132,10 @@
         :precondition (and
             (at ?robot ?room)
             (holding ?ingredient)
-            (or (ingredient-prep-room ?ingredient ?room) (is-preparation-room ?room))
+            (or 
+                (ingredient-prep-room ?ingredient ?room) 
+                (is-preparation-room ?room)
+            )
         )
         :effect (and
             (not (holding ?ingredient))
@@ -147,8 +154,6 @@
             (holding ?tool)
             (tool-use-room ?tool ?room)
             (tool-clean ?tool)
-            (is-free-ingredient ?ingredient)
-            ;(not (ingredient-prepared ?ingredient)); The ingredient must not be already prepared.
         )
         :effect (and
             (ingredient-prepared ?ingredient)
@@ -162,10 +167,8 @@
         :precondition (and
             (is-cooking-room ?room)
             (at ?robot ?room)
-            (is-free-ingredient ?ingredient)
             (ingredient-prepared ?ingredient); The ingredient must be prepared before cooking.
             (holding ?ingredient); The robot must hold the ingredient to cook it.
-            ;(not (ingredient-cooked ?ingredient)); The ingredient must not be already cooked.
         )
         :effect (and
             (ingredient-cooked ?ingredient)
@@ -188,13 +191,19 @@
                     (imply
                         (and (ingredient-used-in-dish ?ingredient ?dish) (require-cooked ?dish ?ingredient))
                         (and (ingredient-cooked ?ingredient) (at ?ingredient ?room)))
-                    (is-free-ingredient ?ingredient)
                 )
             )
         )
         :effect (and
             (dish-prepared ?dish)
             (at ?dish ?room)
+            (forall
+                (?ingredient - ingredient)
+                (when
+                    (ingredient-used-in-dish ?ingredient ?dish)
+                    (not (ingredient-available ?ingredient))
+                )
+            )
         )
     )
 
@@ -206,6 +215,7 @@
             (at ?robot ?room)
             (holding ?dish)
             (dish-prepared ?dish)
+            ; (next-dish ?dish)
             (forall
                 (?other_dish - dish)
                 (imply
@@ -215,10 +225,14 @@
         )
         :effect (and
             (dish-served ?dish)
-            (forall
-                (?ingredient - ingredient)
-                (not (is-free-ingredient ?ingredient))
-            )
+            ; (not (next-dish ?dish))
+            ; (forall 
+            ;     (?other_dish - dish)
+            ;     (when 
+            ;         (prioritize-dish ?dish ?other_dish)
+            ;         (next-dish ?other_dish)
+            ;     )
+            ; )
         )
     )
 

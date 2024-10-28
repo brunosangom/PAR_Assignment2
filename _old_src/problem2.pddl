@@ -1,11 +1,11 @@
-(define (problem basic)
+(define (problem multiple_dishes)
     (:domain robot_chef)
 
     (:objects
         storage-room preparation-room cooking-room serving-room dishwashing-room cutting-room mixing-room - room
-        sushi - dish
+        sushi ramen - dish
         knife spoon - tool
-        rice fish vegetable - ingredient
+        rice fish vegetable noodles broth - ingredient
         chef - robot
     )
 
@@ -18,22 +18,32 @@
         (ingredient-stored fish)
         (ingredient-stored rice)
         (ingredient-stored vegetable)
+        (ingredient-stored noodles)
+        (ingredient-stored broth)
 
         ;; Bind ingredients to specific prep/cooking room
         (ingredient-prep-room rice mixing-room); Rice must be prepared in Mixing room
         (ingredient-prep-room fish cutting-room); Fish must be cut in Cutting room
         (ingredient-prep-room vegetable cutting-room); Vegetables must be cut in Cutting room
+        (ingredient-prep-room noodles mixing-room); Noodles must be prepared in Mixing room
+        (ingredient-prep-room broth mixing-room); Broth must be prepared in Mixing room
 
         ;; Bind dishes to ingredients
         (ingredient-used-in-dish rice sushi)
         (ingredient-used-in-dish fish sushi)
         (ingredient-used-in-dish vegetable sushi)
+        (ingredient-used-in-dish noodles ramen)
+        (ingredient-used-in-dish broth ramen)
 
         ;; Define dish requirements for its ingredient
         (require-prepared sushi vegetable)
         (require-prepared sushi fish)
         (require-cooked sushi rice)
+        (require-cooked ramen noodles)
+        (require-cooked ramen broth)
+
         ; (next-dish sushi)
+        ; (prioritize-dish sushi ramen)
 
         ;; Set each room with a predicate
         (is-storage-room storage-room)
@@ -75,6 +85,8 @@
     (:goal
         (and
             (dish-served sushi)
+            (dish-prepared ramen)
+            ;(dish-served ramen)
         )
 
     )
