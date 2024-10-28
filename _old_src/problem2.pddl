@@ -43,7 +43,7 @@
         (require-cooked ramen broth)
 
         ; (next-dish sushi)
-        ; (prioritize-dish sushi ramen)
+        (prioritize-dish sushi ramen)
 
         ;; Set each room with a predicate
         (is-storage-room storage-room)

@@ -221,12 +221,12 @@
             (holding ?dish)
             (dish-prepared ?dish)
             ; (next-dish ?dish)
-            ; (forall
-            ;     (?other_dish - dish)
-            ;     (imply
-            ;         (prioritize-dish ?other_dish ?dish)
-            ;         (dish-served ?other_dish))
-            ; )
+            (forall
+                (?other_dish - dish)
+                (imply
+                    (prioritize-dish ?other_dish ?dish)
+                    (dish-served ?other_dish))
+            )
         )
         :effect (and
             (dish-served ?dish)
