@@ -18,55 +18,154 @@
 % Redefine the caption format to remove "Figure *:"
 \captionsetup[figure]{labelformat=empty}
 
-\begin{document}
-
 \title{PAR - Assignment 2 - Report}
 \author{\normalsize Bruno Sánchez \& Jean Dié}
 \date{\small 5th November 2024}
 
+\begin{document}
+
 \maketitle
 
-\section{Introduction to the Problem}
-
+% \tableofcontents
+% \newpage
 
 \section{Problem Analysis}
 
-\subsection{Actions}
+To implement the model in \textit{PDDL}, we first need to define the types, predicates, and actions that will be used. The model involves a robot chef operating within a multi-area kitchen environment, where it must navigate between different zones while handling ingredients and tools to prepare various dishes. The types define the basic objects in our domain, such as locations, items (ingredients and tools), and the robot itself. Predicates define the state of the kitchen, such as robot and item locations, tool conditions, and ingredient states. Actions describe the possible operations the robot can perform, including movement between areas, handling items, and performing cooking operations.
 
-\section{Project Structure and PDDL Implementation}
+\subsection{Types}
+\begin{itemize}[label=--, itemsep=0.05em]
+    \item \textbf{location:} Represents different areas in the kitchen (storage, preparation, cooking, etc.)
+    \item \textbf{item:} Base type for anything the robot can handle
+    \item \textbf{robot:} The robot chef itself
+    \item \textbf{ingredient:} Items that can be processed into dishes (inherits from item)
+    \item \textbf{tool:} Kitchen implements used for preparation (inherits from item)
+    \item \textbf{dish:} The final products to be served (inherits from item)
+\end{itemize}
 
+\subsection{Predicates}\label{sec:pred}
+\begin{itemize}[label=--, itemsep=0.05em]
+    \item \textbf{Location and Movement:}
+    \begin{itemize}
+        \item \textit{robot-at ?r ?l:} Robot r is at location l
+        \item \textit{item-at ?i ?l:} Item i is at location l
+        \item \textit{adjacent ?l1 ?l2:} Locations l1 and l2 are adjacent
+        \item \textit{moving-to-serve ?r:} Robot r is currently moving to serve a dish
+    \end{itemize}
+    \item \textbf{Robot State:}
+    \begin{itemize}
+        \item \textit{holding ?r ?i:} Robot r is holding item i
+        \item \textit{hand-free ?r:} Robot's hand is empty
+    \end{itemize}
+    \item \textbf{Location Types:}
+    \begin{itemize}
+        \item \textit{is-storage/cooking/serving/preparation/dishwashing/cutting/mixing ?l:} Location type identifiers
+    \end{itemize}
+    \item \textbf{Ingredient States:}
+    \begin{itemize}
+        \item \textit{ingredient-need-mixing/cutting/cooking ?i:} Ingredient i needs specific processing
+        \item \textit{ingredient-mixed/cut/cooked ?i:} Ingredient i has been processed
+    \end{itemize}
+    \item \textbf{Tool Management:}
+    \begin{itemize}
+        \item \textit{tool-clean ?t:} Tool t is clean and ready for use
+        \item \textit{is-cutting/mixing-tool ?t:} Tool type identifiers
+    \end{itemize}
+    \item \textbf{Dish Preparation:}
+    \begin{itemize}
+        \item \textit{ingredient-for ?i ?d:} Ingredient i is needed for dish d
+        \item \textit{dish-ready/served ?d:} Dish d status
+        \item \textit{has-priority-over ?d1 ?d2:} Dish d1 should be prepared before d2
+    \end{itemize}
+\end{itemize}
 
-\subsection{Requirements}
+\subsection{Actions}\label{sec:act}
+\begin{itemize}[label=--, itemsep=0.05em]
+    \item \textbf{Movement and Item Handling:}
+    \begin{itemize}
+        \item \textit{move:} Robot moves between adjacent locations
+        \item \textit{pick-up:} Robot picks up an item
+        \item \textit{put-down:} Robot puts down an item
+    \end{itemize}
+    \item \textbf{Ingredient Processing:}
+    \begin{itemize}
+        \item \textit{cut-ingredient:} Robot cuts an ingredient using a clean cutting tool
+        \item \textit{mix-ingredient:} Robot mixes an ingredient using a clean mixing tool
+        \item \textit{cook-ingredient:} Robot cooks an ingredient in the cooking area
+    \end{itemize}
+    \item \textbf{Tool Management:}
+    \begin{itemize}
+        \item \textit{clean-tool:} Robot cleans a used tool in the dishwashing area
+    \end{itemize}
+    \item \textbf{Dish Preparation:}
+    \begin{itemize}
+        \item \textit{prepare-dish:} Robot prepares a dish when all ingredients are ready
+        \item \textit{serve-dish:} Robot serves a prepared dish in the serving area
+    \end{itemize}
+\end{itemize}
 
-\subsection{Predicates}
+\section{PDDL Implementation}
+\subsection{Domain File}
+Description of the domain.pddl implementation including:
+\begin{itemize}
+    \item Requirements
+    \item Types
+    \item Predicates
+    \item Actions
+\end{itemize}
 
-\subsection{Actions}
-
-\subsubsection{Movement}
-
-\subsubsection{Pick-up}
-
-\subsubsection{Drop-off}
-
-\subsubsection{Evacuate-Safe-Zone}
+\subsection{Problem Files}
+Description of at least 3 test scenarios:
+\begin{itemize}
+    \item Basic Sushi Preparation
+    \item Complex Multi-Dish Scenario
+    \item Error Handling Scenario
+\end{itemize}
 
 \section{Test Cases and Results}
+\subsection{Scenario 1: Basic Sushi Preparation}
+[Description, initial state, goal state, and analysis of results]
 
-\subsection{Case 1}
+\subsection{Scenario 2: Multiple dishes}
+[Description, initial state, goal state, and analysis of results]
 
-\subsection{Case 2}
+\subsection{Scenario 3: Multiple servings}
+[Description, initial state, goal state, and analysis of results]
 
-\subsection{Case 3}
+\subsection{Scenario 4: Priority}
+[Description, initial state, goal state, and analysis of results]
 
-\subsection{Case 4}
-
-\subsection{Case 5}
-
-\subsection{Case 6}
+\subsection{Scenario 5: Missing ingredients (error handling scenario)}
+[Description, initial state, goal state, and analysis of results]
 
 \section{Performance Analysis}
+Analysis of the planner's performance including:
+\begin{itemize}
+    \item Plan costs
+    \item Number of nodes generated
+    \item Number of nodes expanded
+    \item Execution time
+    \item Comparison between different scenarios
+\end{itemize}
 
 \section{Conclusion}
+Summary of the implementation, results, and potential improvements:
+\begin{itemize}
+    \item Effectiveness of the PDDL model
+    \item Scalability analysis
+    \item Limitations and possible enhancements
+    \item Real-world applicability
+\end{itemize}
 
+% \appendix
+% \section{PDDL Code}
+% \subsection{Domain File}
+% [Include the complete domain.pddl code]
+
+% \subsection{Problem Files}
+% [Include the complete problem.pddl files for each scenario]
+
+% \section{Generated Plans}
+% [Include the generated plans for each scenario]
 
 \end{document}
