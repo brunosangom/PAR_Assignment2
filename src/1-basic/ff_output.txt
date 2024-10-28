@@ -12,22 +12,21 @@ problem 'BASIC' defined
 
 
 
-Cueing down from goal distance:   23 into depth [1][2][3][4]
+Cueing down from goal distance:   23 into depth [1][2][3][4][5]
                                   22            [1][2][3][4][5]
-                                  21            [1][2][3][4][5]
-                                  20            [1]
+                                  21            [1][2][3][4]
                                   19            [1][2][3]
-                                  18            [1][2][3][4]
+                                  18            [1]
                                   17            [1]
-                                  16            [1][2]
-                                  15            [1][2][3][4]
-                                  14            [1][2][3]
-                                  13            [1][2][3][4][5][6]
-                                  12            [1][2][3]
-                                  11            [1][2][3][4][5][6]
-                                  10            [1][2][3]
-                                   9            [1][2][3][4][5][6][7][8][9]
-                                   8            [1][2][3][4]
+                                  16            [1][2][3][4]
+                                  15            [1][2]
+                                  14            [1]
+                                  13            [1][2][3][4][5][6][7][8][9]
+                                  12            [1][2][3][4][5][6][7]
+                                  11            [1]
+                                  10            [1][2][3][4]
+                                   9            [1]
+                                   8            [1]
                                    7            [1]
                                    6            [1]
                                    5            [1]
@@ -42,74 +41,66 @@ ff: found legal plan as follows
 step    0: MOVE CHEF COOKING-ROOM PREPARATION-ROOM
         1: MOVE CHEF PREPARATION-ROOM MIXING-ROOM
         2: MOVE CHEF MIXING-ROOM STORAGE-ROOM
-        3: PICK-UP-INGREDIENT CHEF FISH STORAGE-ROOM
+        3: PICK-UP CHEF FISH STORAGE-ROOM
         4: MOVE CHEF STORAGE-ROOM MIXING-ROOM
         5: MOVE CHEF MIXING-ROOM CUTTING-ROOM
-        6: DROP-INGREDIENT CHEF FISH CUTTING-ROOM
+        6: PUT-DOWN CHEF FISH CUTTING-ROOM
         7: MOVE CHEF CUTTING-ROOM STORAGE-ROOM
-        8: PICK-UP-INGREDIENT CHEF VEGETABLE STORAGE-ROOM
-        9: MOVE CHEF STORAGE-ROOM MIXING-ROOM
-       10: MOVE CHEF MIXING-ROOM CUTTING-ROOM
-       11: DROP-INGREDIENT CHEF VEGETABLE CUTTING-ROOM
-       12: MOVE CHEF CUTTING-ROOM STORAGE-ROOM
-       13: PICK-UP-INGREDIENT CHEF RICE STORAGE-ROOM
-       14: MOVE CHEF STORAGE-ROOM MIXING-ROOM
-       15: DROP-INGREDIENT CHEF RICE MIXING-ROOM
-       16: PICK-UP-INGREDIENT CHEF RICE MIXING-ROOM
-       17: MOVE CHEF MIXING-ROOM PREPARATION-ROOM
-       18: DROP-INGREDIENT CHEF RICE PREPARATION-ROOM
-       19: MOVE CHEF PREPARATION-ROOM MIXING-ROOM
-       20: PICK-UP-TOOL CHEF SPOON MIXING-ROOM
-       21: PREPARE-INGREDIENT CHEF RICE SPOON MIXING-ROOM
-       22: DROP-TOOL CHEF SPOON MIXING-ROOM
-       23: MOVE CHEF MIXING-ROOM PREPARATION-ROOM
-       24: PICK-UP-INGREDIENT CHEF RICE PREPARATION-ROOM
-       25: MOVE CHEF PREPARATION-ROOM COOKING-ROOM
-       26: COOK-INGREDIENT CHEF RICE COOKING-ROOM
-       27: MOVE CHEF COOKING-ROOM PREPARATION-ROOM
-       28: DROP-INGREDIENT CHEF RICE PREPARATION-ROOM
-       29: MOVE CHEF PREPARATION-ROOM COOKING-ROOM
-       30: MOVE CHEF COOKING-ROOM SERVING-ROOM
-       31: MOVE CHEF SERVING-ROOM CUTTING-ROOM
-       32: PICK-UP-INGREDIENT CHEF FISH CUTTING-ROOM
-       33: MOVE CHEF CUTTING-ROOM MIXING-ROOM
-       34: MOVE CHEF MIXING-ROOM PREPARATION-ROOM
-       35: DROP-INGREDIENT CHEF FISH PREPARATION-ROOM
-       36: MOVE CHEF PREPARATION-ROOM COOKING-ROOM
-       37: MOVE CHEF COOKING-ROOM SERVING-ROOM
-       38: MOVE CHEF SERVING-ROOM CUTTING-ROOM
-       39: PICK-UP-INGREDIENT CHEF VEGETABLE CUTTING-ROOM
-       40: MOVE CHEF CUTTING-ROOM MIXING-ROOM
-       41: MOVE CHEF MIXING-ROOM PREPARATION-ROOM
-       42: DROP-INGREDIENT CHEF VEGETABLE PREPARATION-ROOM
-       43: MOVE CHEF PREPARATION-ROOM COOKING-ROOM
-       44: MOVE CHEF COOKING-ROOM SERVING-ROOM
-       45: MOVE CHEF SERVING-ROOM CUTTING-ROOM
-       46: PICK-UP-TOOL CHEF KNIFE CUTTING-ROOM
-       47: PREPARE-INGREDIENT CHEF FISH KNIFE CUTTING-ROOM
-       48: MOVE CHEF CUTTING-ROOM MIXING-ROOM
-       49: MOVE CHEF MIXING-ROOM PREPARATION-ROOM
-       50: MOVE CHEF PREPARATION-ROOM DISHWASHING-ROOM
-       51: CLEAN-TOOL CHEF KNIFE DISHWASHING-ROOM
-       52: MOVE CHEF DISHWASHING-ROOM COOKING-ROOM
-       53: MOVE CHEF COOKING-ROOM SERVING-ROOM
-       54: MOVE CHEF SERVING-ROOM CUTTING-ROOM
-       55: PREPARE-INGREDIENT CHEF VEGETABLE KNIFE CUTTING-ROOM
-       56: DROP-TOOL CHEF KNIFE CUTTING-ROOM
-       57: MOVE CHEF CUTTING-ROOM MIXING-ROOM
-       58: MOVE CHEF MIXING-ROOM PREPARATION-ROOM
-       59: ASSEMBLE-DISH CHEF SUSHI PREPARATION-ROOM
-       60: PICK-UP-DISH CHEF SUSHI PREPARATION-ROOM
-       61: MOVE CHEF PREPARATION-ROOM COOKING-ROOM
-       62: MOVE CHEF COOKING-ROOM SERVING-ROOM
-       63: SERVE-DISH CHEF SERVING-ROOM SUSHI
+        8: PICK-UP CHEF VEGETABLE STORAGE-ROOM
+        9: MOVE CHEF STORAGE-ROOM CUTTING-ROOM
+       10: PUT-DOWN CHEF VEGETABLE CUTTING-ROOM
+       11: MOVE CHEF CUTTING-ROOM STORAGE-ROOM
+       12: PICK-UP CHEF RICE STORAGE-ROOM
+       13: MOVE CHEF STORAGE-ROOM MIXING-ROOM
+       14: PUT-DOWN CHEF RICE MIXING-ROOM
+       15: PICK-UP CHEF SPOON MIXING-ROOM
+       16: MIX-INGREDIENT CHEF RICE SPOON MIXING-ROOM
+       17: PUT-DOWN CHEF SPOON MIXING-ROOM
+       18: PICK-UP CHEF RICE MIXING-ROOM
+       19: MOVE CHEF MIXING-ROOM PREPARATION-ROOM
+       20: MOVE CHEF PREPARATION-ROOM COOKING-ROOM
+       21: PUT-DOWN CHEF RICE COOKING-ROOM
+       22: COOK-INGREDIENT CHEF RICE COOKING-ROOM
+       23: PICK-UP CHEF RICE COOKING-ROOM
+       24: MOVE CHEF COOKING-ROOM PREPARATION-ROOM
+       25: PUT-DOWN CHEF RICE PREPARATION-ROOM
+       26: MOVE CHEF PREPARATION-ROOM MIXING-ROOM
+       27: MOVE CHEF MIXING-ROOM CUTTING-ROOM
+       28: PICK-UP CHEF KNIFE CUTTING-ROOM
+       29: CUT-INGREDIENT CHEF FISH KNIFE CUTTING-ROOM
+       30: PUT-DOWN CHEF KNIFE CUTTING-ROOM
+       31: PICK-UP CHEF FISH CUTTING-ROOM
+       32: MOVE CHEF CUTTING-ROOM MIXING-ROOM
+       33: MOVE CHEF MIXING-ROOM PREPARATION-ROOM
+       34: PUT-DOWN CHEF FISH PREPARATION-ROOM
+       35: MOVE CHEF PREPARATION-ROOM MIXING-ROOM
+       36: MOVE CHEF MIXING-ROOM CUTTING-ROOM
+       37: PICK-UP CHEF KNIFE CUTTING-ROOM
+       38: MOVE CHEF CUTTING-ROOM MIXING-ROOM
+       39: MOVE CHEF MIXING-ROOM PREPARATION-ROOM
+       40: MOVE CHEF PREPARATION-ROOM DISHWASHING-ROOM
+       41: CLEAN-TOOL CHEF KNIFE DISHWASHING-ROOM
+       42: MOVE CHEF DISHWASHING-ROOM COOKING-ROOM
+       43: MOVE CHEF COOKING-ROOM PREPARATION-ROOM
+       44: MOVE CHEF PREPARATION-ROOM MIXING-ROOM
+       45: MOVE CHEF MIXING-ROOM CUTTING-ROOM
+       46: CUT-INGREDIENT CHEF VEGETABLE KNIFE CUTTING-ROOM
+       47: PUT-DOWN CHEF KNIFE CUTTING-ROOM
+       48: PICK-UP CHEF VEGETABLE CUTTING-ROOM
+       49: MOVE CHEF CUTTING-ROOM MIXING-ROOM
+       50: MOVE CHEF MIXING-ROOM PREPARATION-ROOM
+       51: PUT-DOWN CHEF VEGETABLE PREPARATION-ROOM
+       52: PREPARE-DISH CHEF SUSHI PREPARATION-ROOM
+       53: MOVE CHEF PREPARATION-ROOM COOKING-ROOM
+       54: MOVE CHEF COOKING-ROOM SERVING-ROOM
+       55: SERVE-DISH CHEF SUSHI SERVING-ROOM
      
 
-time spent:    0.00 seconds instantiating 69 easy, 7 hard action templates
-               0.00 seconds reachability analysis, yielding 41 facts and 46 actions
-               0.00 seconds creating final representation with 38 relevant facts
+time spent:    0.00 seconds instantiating 91 easy, 17 hard action templates
+               0.00 seconds reachability analysis, yielding 60 facts and 94 actions
+               0.00 seconds creating final representation with 60 relevant facts
                0.00 seconds building connectivity graph
-               0.00 seconds searching, evaluating 220 states, to a max depth of 9
+               0.00 seconds searching, evaluating 327 states, to a max depth of 9
                0.00 seconds total time
 
 

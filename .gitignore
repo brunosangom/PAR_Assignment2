@@ -1,3 +1,7 @@
+execution.details
+plan
+output.sas
+
 # Python 
 __pycache__/
 *.py[cod]

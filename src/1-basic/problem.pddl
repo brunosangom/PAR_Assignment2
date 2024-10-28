@@ -2,61 +2,52 @@
     (:domain robot_chef)
 
     (:objects
-        storage-room preparation-room cooking-room serving-room dishwashing-room cutting-room mixing-room - room
-        sushi - dish
+        storage-room cutting-room mixing-room cooking-room preparation-room serving-room dishwashing-room - location
+        chef - robot
         knife spoon - tool
         rice fish vegetable - ingredient
-        chef - robot
+        sushi - dish
     )
 
     (:init
-        ;; Initial room of the robot
-        (at chef cooking-room)
-        (hand-free)
+        ; Robot initial location
+        (robot-at chef cooking-room)
+        (hand-free chef)
 
-        ;; Ingredients in the storage
-        (at rice storage-room)
-        (at fish storage-room)
-        (at vegetable storage-room)
+        ; Kitchen layout
+        (is-storage storage-room)
+        (is-cutting cutting-room)
+        (is-mixing mixing-room)
+        (is-cooking cooking-room)
+        (is-preparation preparation-room)
+        (is-serving serving-room)
+        (is-dishwashing dishwashing-room)
 
-        ;; Ingredient quantities
-        (is-free-ingredient fish)
-        (is-free-ingredient rice)
-        (is-free-ingredient vegetable)
+        ; Initial ingredients location
+        (item-at rice storage-room)
+        (item-at fish storage-room)
+        (item-at vegetable storage-room)
 
-        ;; Bind ingredients to specific prep/cooking room
-        (ingredient-prep-room rice mixing-room); Rice must be prepared in Mixing room
-        (ingredient-prep-room fish cutting-room); Fish must be cut in Cutting room
-        (ingredient-prep-room vegetable cutting-room); Vegetables must be cut in Cutting room
-
-        ;; Bind dishes to ingredients
-        (ingredient-used-in-dish rice sushi)
-        (ingredient-used-in-dish fish sushi)
-        (ingredient-used-in-dish vegetable sushi)
-
-        ;; Define dish requirements for its ingredient
-        (require-prepared sushi vegetable)
-        (require-prepared sushi fish)
-        (require-cooked sushi rice)
-
-        ;; Set each room with a predicate
-        (is-storage-room storage-room)
-        (is-preparation-room preparation-room)
-        (is-cooking-room cooking-room)
-        (is-serving-room serving-room)
-        (is-dishwashing-room dishwashing-room)
-        (is-cutting-room cutting-room)
-        (is-mixing-room mixing-room)
-
-        ;; Tool setup
-        (tool-use-room knife cutting-room)
-        (tool-use-room spoon mixing-room)
-        (at knife cutting-room)
-        (at spoon mixing-room)
+        ; Tools setup
+        (item-at knife cutting-room)
+        (item-at spoon mixing-room)
         (tool-clean knife)
         (tool-clean spoon)
+        (is-cutting-tool knife)
+        (is-mixing-tool spoon)
 
-        ;; Adjacency between rooms
+        ; Ingredient requirements
+        (ingredient-need-mixing rice)
+        (ingredient-need-cooking rice)
+        (ingredient-need-cutting fish)
+        (ingredient-need-cutting vegetable)
+
+        ; Recipe definitions
+        (ingredient-for rice sushi)
+        (ingredient-for fish sushi)
+        (ingredient-for vegetable sushi)
+
+        ; Room connections - Using the definitive connections
         (adjacent serving-room cooking-room)
         (adjacent cooking-room serving-room)
         (adjacent cooking-room dishwashing-room)
@@ -72,14 +63,12 @@
         (adjacent storage-room mixing-room)
         (adjacent mixing-room storage-room)
         (adjacent cutting-room storage-room)
-        (adjacent serving-room cutting-room)
-
+        (adjacent storage-room cutting-room)
     )
 
     (:goal
         (and
             (dish-served sushi)
         )
-
     )
 )

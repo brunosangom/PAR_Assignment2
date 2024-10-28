@@ -7,7 +7,7 @@ def list_planners():
     return [
         "dual-bfws-ffparser",
         "ff",
-        "smtplan",
+        "downward",
         # TODO: other planners
     ]
 
@@ -63,6 +63,8 @@ def main():
     if not problems:
         print("No directories with problem.pddl files found in the src folder.")
         return
+
+    problems.sort(reverse=False)
 
     questions = [
         {

@@ -1,8 +1,8 @@
-(define (problem cook-meals)
+(define (problem multiple_dishes)
     (:domain robot_chef)
 
     (:objects
-        kitchen-storage kitchen-cutting kitchen-mixing kitchen-cooking kitchen-prep kitchen-serving kitchen-washing - location
+        storage-room cutting-room mixing-room cooking-room preparation-room serving-room dishwashing-room - location
         chef - robot
         knife spoon - tool
         rice fish vegetables noodles broth - ingredient
@@ -11,48 +11,28 @@
 
     (:init
         ; Robot initial location
-        (robot-at chef kitchen-cooking)
+        (robot-at chef cooking-room)
         (hand-free chef)
 
         ; Kitchen layout
-        (is-storage kitchen-storage)
-        (is-cutting kitchen-cutting)
-        (is-mixing kitchen-mixing)
-        (is-cooking kitchen-cooking)
-        (is-preparation kitchen-prep)
-        (is-serving kitchen-serving)
-        (is-dishwashing kitchen-washing)
-
-        ; Room connections
-        (connected kitchen-storage kitchen-mixing)
-        (connected kitchen-mixing kitchen-storage)
-        (connected kitchen-storage kitchen-cutting)
-        (connected kitchen-cutting kitchen-storage)
-        (connected kitchen-mixing kitchen-cutting)
-        (connected kitchen-cutting kitchen-mixing)
-        (connected kitchen-mixing kitchen-prep)
-        (connected kitchen-prep kitchen-mixing)
-        (connected kitchen-prep kitchen-cooking)
-        (connected kitchen-cooking kitchen-prep)
-        (connected kitchen-prep kitchen-washing)
-        (connected kitchen-washing kitchen-prep)
-        (connected kitchen-cooking kitchen-washing)
-        (connected kitchen-washing kitchen-cooking)
-        (connected kitchen-cooking kitchen-serving)
-        (connected kitchen-serving kitchen-cooking)
-        (connected kitchen-cutting kitchen-serving)
-        (connected kitchen-serving kitchen-cutting)
+        (is-storage storage-room)
+        (is-cutting cutting-room)
+        (is-mixing mixing-room)
+        (is-cooking cooking-room)
+        (is-preparation preparation-room)
+        (is-serving serving-room)
+        (is-dishwashing dishwashing-room)
 
         ; Initial ingredients location
-        (item-at rice kitchen-storage)
-        (item-at fish kitchen-storage)
-        (item-at vegetables kitchen-storage)
-        (item-at noodles kitchen-storage)
-        (item-at broth kitchen-storage)
+        (item-at rice storage-room)
+        (item-at fish storage-room)
+        (item-at vegetables storage-room)
+        (item-at noodles storage-room)
+        (item-at broth storage-room)
 
         ; Tools setup
-        (item-at knife kitchen-cutting)
-        (item-at spoon kitchen-mixing)
+        (item-at knife cutting-room)
+        (item-at spoon mixing-room)
         (tool-clean knife)
         (tool-clean spoon)
         (is-cutting-tool knife)
@@ -75,6 +55,24 @@
         (ingredient-for noodles ramen)
         (ingredient-for broth ramen)
         (ingredient-for vegetables ramen)
+
+        ; Room connections
+        (adjacent serving-room cooking-room)
+        (adjacent cooking-room serving-room)
+        (adjacent cooking-room dishwashing-room)
+        (adjacent dishwashing-room cooking-room)
+        (adjacent preparation-room dishwashing-room)
+        (adjacent dishwashing-room preparation-room)
+        (adjacent preparation-room cooking-room)
+        (adjacent cooking-room preparation-room)
+        (adjacent mixing-room preparation-room)
+        (adjacent preparation-room mixing-room)
+        (adjacent mixing-room cutting-room)
+        (adjacent cutting-room mixing-room)
+        (adjacent storage-room mixing-room)
+        (adjacent mixing-room storage-room)
+        (adjacent cutting-room storage-room)
+        (adjacent storage-room cutting-room)
     )
 
     (:goal
