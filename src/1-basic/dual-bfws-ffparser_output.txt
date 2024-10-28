@@ -1,0 +1,95 @@
+Command execution completed.
+
+Planner Output:
+---------------
+ --- OK.
+ Match tree built with 46 nodes.
+
+PDDL problem description loaded: 
+	Domain: ROBOT_CHEF
+	Problem: BASIC
+	#Actions: 46
+	#Fluents: 38
+Goals found: 1
+Goals_Edges found: 1
+Starting search with 1-BFWS...
+--[1 / 0]--
+--[1 / 1]--
+--[1 / 2]--
+--[1 / 3]--
+--[1 / 4]--
+--[1 / 5]--
+Total time: 0.000144999
+Nodes generated during search: 33
+Nodes expanded during search: 24
+Plan found with cost: NOTFOUND
+Fast-BFS search completed in 0.000144999 secs
+Starting search with BFWS(novel,land,h_(add)ff)...
+Landmarks found: 23
+Landmarks_Edges found: 69
+--[69 / 4294967295]--
+--[69 / 132]--
+--[69 / 116]--
+--[68 / 116]--
+--[68 / 106]--
+--[68 / 86]--
+--[67 / 86]--
+--[65 / 86]--
+--[64 / 86]--
+--[64 / 76]--
+--[63 / 76]--
+--[62 / 76]--
+--[61 / 76]--
+--[57 / 76]--
+--[56 / 76]--
+--[56 / 72]--
+--[55 / 72]--
+--[53 / 72]--
+--[52 / 72]--
+--[52 / 66]--
+--[50 / 66]--
+--[49 / 66]--
+--[49 / 58]--
+--[49 / 54]--
+--[47 / 54]--
+--[47 / 46]--
+--[46 / 46]--
+--[45 / 46]--
+--[44 / 46]--
+--[40 / 46]--
+--[38 / 46]--
+--[38 / 44]--
+--[36 / 44]--
+--[36 / 40]--
+--[36 / 36]--
+--[35 / 36]--
+--[34 / 36]--
+--[34 / 35]--
+--[34 / 28]--
+--[31 / 28]--
+--[31 / 25]--
+--[29 / 25]--
+--[29 / 22]--
+--[29 / 19]--
+--[29 / 15]--
+--[25 / 15]--
+--[25 / 12]--
+--[25 / 9]--
+--[24 / 9]--
+--[24 / 7]--
+--[8 / 7]--
+--[8 / 6]--
+--[8 / 4]--
+--[8 / 3]--
+--[5 / 3]--
+--[5 / 2]--
+--[5 / 1]--
+--[4 / 1]--
+--[4 / 0]--
+--[0 / 0]--
+Total time: 0.004227
+Nodes generated during search: 849
+Nodes expanded during search: 291
+Plan found with cost: 62
+BFS search completed in 0.004227 secs
+

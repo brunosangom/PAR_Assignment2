@@ -1,77 +1,67 @@
 import os
-from InquirerPy import prompt
 import subprocess
+from InquirerPy import prompt
 
 
 def list_planners():
     return [
-        # "optic", Does not support ADL
-        # "downward",
-        # "delfi",
-        # "ff",
-        # "lama",
-        # "metric-ff",
         "dual-bfws-ffparser",
-        # "enhsp",
-        # "tfd",
-        # "ipc2023_spock",
-        # "kstar",
-        # "pyperplan",
-        # "smtplan",
-        # "popf",
-        # "enhsp-2020",
-        # "lpg-td",
+        "ff",
+        "smtplan",
+        # TODO: other planners
     ]
 
 
-def find_pddl_directories(src_path):
-    directories = []
+def find_pddl_problems(src_path):
+    problems = []
     for entry in os.scandir(src_path):
         if entry.is_dir():
-            domain_path = os.path.join(entry.path, "domain.pddl")
             problem_path = os.path.join(entry.path, "problem.pddl")
-            if os.path.isfile(domain_path) and os.path.isfile(problem_path):
-                directories.append(entry.name)
-    return directories
+            if os.path.isfile(problem_path):
+                problems.append(entry.name)
+    return problems
 
 
-def run_planner(planner, domain_file, problem_file):
+def run_planner(planner, domain_file, problem_file, output_file):
 
-    if planner == "enhsp-2020":
-        command = (
-            f"planutils run {planner} --domain {domain_file} --problem {problem_file}"
-        )
+    if planner == "enhsp":
+        command = ["planutils", "run", planner, "-o", domain_file, "-f", problem_file]
     else:
-        command = f"planutils run {planner} {domain_file} {problem_file}"
+        command = ["planutils", "run", planner, domain_file, problem_file]
 
     try:
-        result = subprocess.run(command, shell=True, text=True, capture_output=True)
-        print("Command execution completed.")
+        with open(output_file, "w") as f:
+            result = subprocess.run(command, text=True, capture_output=True)
+            f.write("Command execution completed.\n\n")
 
-        if result.stdout:
-            print("Planner Output:")
-            print("---------------")
-            print(result.stdout)
+            if result.stdout:
+                f.write("Planner Output:\n")
+                f.write("---------------\n")
+                f.write(result.stdout)
+                f.write("\n")
 
-        if result.stderr:
-            print("Error/Debug Information:")
-            print("------------------------")
-            print(result.stderr)
+            if result.stderr:
+                f.write("Error/Debug Information:\n")
+                f.write("------------------------\n")
+                f.write(result.stderr)
+                f.write("\n")
 
-        if result.returncode != 0:
-            print(f"Execution failed with return code: {result.returncode}")
+            if result.returncode != 0:
+                f.write(f"Execution failed with return code: {result.returncode}\n")
+
+        print(f"Planner output saved to {output_file}")
 
     except Exception as e:
         print(f"An error occurred when running the planner: {e}")
 
 
 def main():
-    src_path = "src"
+    src_path = os.path.dirname(os.path.abspath(__file__))
     planners = list_planners()
-    directories = find_pddl_directories(src_path)
+    problems = find_pddl_problems(src_path)
 
-    if not directories:
-        print("No directories with PDDL files found in the src folder.")
+    if not problems:
+        print("No directories with problem.pddl files found in the src folder.")
         return
 
     questions = [
@@ -83,22 +73,26 @@ def main():
         },
         {
             "type": "list",
-            "name": "directory",
-            "message": "Select a problem (directory containing domain.pddl and problem.pddl)",
-            "choices": directories,
+            "name": "problem",
+            "message": "Select a problem (directory containing problem.pddl)",
+            "choices": problems,
         },
     ]
 
     answers = prompt(questions)
     selected_planner = answers["planner"]
-    selected_directory = answers["directory"]
-    domain_file = os.path.join(src_path, selected_directory, "domain.pddl")
-    problem_file = os.path.join(src_path, selected_directory, "problem.pddl")
-
-    print(
-        f"Running planner '{selected_planner}' on directory '{selected_directory}'..."
+    selected_problem = answers["problem"]
+    domain_file = os.path.join(src_path, "domain.pddl")
+    problem_file = os.path.join(src_path, selected_problem, "problem.pddl")
+    output_file = os.path.join(
+        src_path, selected_problem, f"{selected_planner}_output.txt"
     )
-    run_planner(selected_planner, domain_file, problem_file)
+    output_file = os.path.join(
+        src_path, selected_problem, f"{selected_planner}_output.txt"
+    )
+
+    print(f"Running planner '{selected_planner}' on problem '{selected_problem}'...")
+    run_planner(selected_planner, domain_file, problem_file, output_file)
 
 
 if __name__ == "__main__":

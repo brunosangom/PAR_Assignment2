@@ -19,7 +19,7 @@
         (at fish storage-room)
         (at vegetable storage-room)
 
-        ;; Fluent ingredient quantities
+        ;; Ingredient quantities
         (is-free-ingredient fish)
         (is-free-ingredient rice)
         (is-free-ingredient vegetable)
