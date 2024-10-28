@@ -201,7 +201,12 @@
                 (?ingredient - ingredient)
                 (when
                     (ingredient-used-in-dish ?ingredient ?dish)
-                    (not (ingredient-available ?ingredient))
+                    (and 
+                        (not (ingredient-available ?ingredient))
+                        (not (at ?ingredient ?room))
+                        (not (ingredient-cooked ?ingredient))
+                        (not (ingredient-prepared ?ingredient))
+                    )
                 )
             )
         )
@@ -216,15 +221,17 @@
             (holding ?dish)
             (dish-prepared ?dish)
             ; (next-dish ?dish)
-            (forall
-                (?other_dish - dish)
-                (imply
-                    (prioritize-dish ?other_dish ?dish)
-                    (dish-served ?other_dish))
-            )
+            ; (forall
+            ;     (?other_dish - dish)
+            ;     (imply
+            ;         (prioritize-dish ?other_dish ?dish)
+            ;         (dish-served ?other_dish))
+            ; )
         )
         :effect (and
             (dish-served ?dish)
+            (not (holding ?dish))
+            (hand-free)
             ; (not (next-dish ?dish))
             ; (forall 
             ;     (?other_dish - dish)

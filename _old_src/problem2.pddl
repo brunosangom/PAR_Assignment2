@@ -85,8 +85,7 @@
     (:goal
         (and
             (dish-served sushi)
-            (dish-prepared ramen)
-            ;(dish-served ramen)
+            (dish-served ramen)
         )
 
     )
