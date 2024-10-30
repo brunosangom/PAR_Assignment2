@@ -29,11 +29,11 @@ Starting search with 1-BFWS...
 --[2 / 16]--
 --[2 / 17]--
 --[2 / 18]--
-Total time: 0.000492
+Total time: 0.000323
 Nodes generated during search: 126
 Nodes expanded during search: 103
 Plan found with cost: NOTFOUND
-Fast-BFS search completed in 0.000492 secs
+Fast-BFS search completed in 0.000323 secs
 Starting search with BFWS(novel,land,h_(add)ff)...
 Landmarks found: 38
 Landmarks_Edges found: 124
@@ -139,9 +139,9 @@ Landmarks_Edges found: 124
 --[6 / 1]--
 --[6 / 0]--
 --[0 / 0]--
-Total time: 0.015398
+Total time: 0.013317
 Nodes generated during search: 2058
 Nodes expanded during search: 669
 Plan found with cost: 102
-BFS search completed in 0.015398 secs
+BFS search completed in 0.013317 secs
 

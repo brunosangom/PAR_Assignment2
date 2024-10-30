@@ -20,9 +20,9 @@
         (ingredient-stored vegetable)
 
         ;; Bind ingredients to specific prep/cooking room
-        (ingredient-prep-room rice mixing-room); Rice must be prepared in Mixing room
-        (ingredient-prep-room fish cutting-room); Fish must be cut in Cutting room
-        (ingredient-prep-room vegetable cutting-room); Vegetables must be cut in Cutting room
+        (ingredient-prep-room rice mixing-room)
+        (ingredient-prep-room fish cutting-room)
+        (ingredient-prep-room vegetable cutting-room)
 
         ;; Bind dishes to ingredients
         (ingredient-used-in-dish rice sushi)
@@ -33,7 +33,9 @@
         (require-prepared sushi vegetable)
         (require-prepared sushi fish)
         (require-cooked sushi rice)
-        ; (next-dish sushi)
+
+        ;; Set sushi as the next dish to prepare (uncommented this line)
+        (next-dish sushi)
 
         ;; Set each room with a predicate
         (is-storage-room storage-room)
@@ -69,13 +71,11 @@
         (adjacent mixing-room storage-room)
         (adjacent cutting-room storage-room)
         (adjacent storage-room cutting-room)
-
     )
 
     (:goal
         (and
             (dish-served sushi)
         )
-
     )
 )

@@ -25,6 +25,15 @@ def run_planner(domain_file, problem_file, output_file):
             if result.returncode != 0:
                 f.write(f"Execution failed with return code: {result.returncode}\n")
 
+        # Handle 'execution.details' and rename 'plan' file
+        if os.path.exists("execution.details"):
+            os.remove("execution.details")
+
+        plan_file = "plan"
+        if os.path.exists(plan_file):
+            new_plan_name = f"{problem_file[:-5]}_dual-bfws-ffparser.plan"
+            os.rename(plan_file, new_plan_name)
+
         print(f"Planner output saved to {output_file}")
 
     except Exception as e:

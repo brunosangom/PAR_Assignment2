@@ -97,8 +97,8 @@
         )
     )
 
-    ;; The robot buys an ingredient.
-    (:action buy-ingredient
+    ;; The robot refills an ingredient.
+    (:action refill-ingredient
         :parameters (?robot - robot ?ingredient - ingredient ?room - room)
         :precondition (and
             (at ?robot ?room)

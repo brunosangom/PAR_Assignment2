@@ -22,11 +22,11 @@
         (ingredient-stored broth)
 
         ;; Bind ingredients to specific prep/cooking room
-        (ingredient-prep-room rice mixing-room); Rice must be prepared in Mixing room
-        (ingredient-prep-room fish cutting-room); Fish must be cut in Cutting room
-        (ingredient-prep-room vegetable cutting-room); Vegetables must be cut in Cutting room
-        (ingredient-prep-room noodles mixing-room); Noodles must be prepared in Mixing room
-        (ingredient-prep-room broth mixing-room); Broth must be prepared in Mixing room
+        (ingredient-prep-room rice mixing-room)
+        (ingredient-prep-room fish cutting-room)
+        (ingredient-prep-room vegetable cutting-room)
+        (ingredient-prep-room noodles mixing-room)
+        (ingredient-prep-room broth mixing-room)
 
         ;; Bind dishes to ingredients
         (ingredient-used-in-dish rice sushi)
