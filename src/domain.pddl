@@ -1,204 +1,259 @@
 (define (domain robot_chef)
-    (:requirements :strips :typing :negative-preconditions :disjunctive-preconditions)
+    (:requirements :strips :typing :negative-preconditions :disjunctive-preconditions :conditional-effects :universal-preconditions)
 
+    ;; Define types and type hierarchy
     (:types
-        location - object
-        item - object
-        robot - object
-        ingredient tool dish - item
-    )
+        room - object; Define a type for locations/rooms
+        movable - object; Define a type for movable objects
+        robot - movable; Define a type for the robot
+        item - movable; Define a general type 'item' for anything the robot might hold
+        ingredient tool dish - item; 'ingredient', 'tool', and 'dish' are subtypes of 'item'
+        )
 
     (:predicates
-        (robot-at ?r - robot ?l - location)
-        (item-at ?i - item ?l - location)
-        (holding ?r - robot ?i - item)
-        (hand-free ?r - robot)
-        (adjacent ?l1 ?l2 - location)
+        ;; Basic predicates
+        (at ?movable - movable ?room - room); A movable object is in a specific room.
 
-        (is-storage ?l - location)
-        (is-cooking ?l - location)
-        (is-serving ?l - location)
-        (is-preparation ?l - location)
-        (is-dishwashing ?l - location)
-        (is-cutting ?l - location)
-        (is-mixing ?l - location)
+        (holding ?item - item); The robot is holding an item.
+        (hand-free); The robot hand is free
+        (adjacent ?room1 - room ?room2 - room); The rooms are adjacent.
 
-        (ingredient-need-mixing ?i - ingredient)
-        (ingredient-need-cutting ?i - ingredient)
-        (ingredient-need-cooking ?i - ingredient)
+        (tool-clean ?tool - tool); A tool is clean.
 
-        (ingredient-mixed ?i - ingredient)
-        (ingredient-cut ?i - ingredient)
-        (ingredient-cooked ?i - ingredient)
+        (prioritize-dish ?dish1 ?dish2); dish1 has higher priority than dish2.
+        (dish-prepared ?dish - dish); The dish is fully prepared.
+        (dish-served ?dish - dish); The dish is served
 
-        (tool-clean ?t - tool)
-        (is-cutting-tool ?t - tool)
-        (is-mixing-tool ?t - tool)
+        (ingredient-stored ?ingredient - ingredient); The ingredient is in the storage.
+        (ingredient-available ?ingredient - ingredient); The ingredient is available in the kitchen.
+        (ingredient-prepared ?ingredient - ingredient); The ingredient is prepared .
+        (ingredient-cooked ?ingredient - ingredient); The ingredient is cooked.
 
-        (ingredient-for ?i - ingredient ?d - dish)
-        (dish-ready ?d - dish)
-        (moving-to-serve ?r - robot)
-        (dish-served ?d - dish)
+        (is-storage-room ?room - room); The room is the storage room.
+        (is-cooking-room ?room - room); The room is the cooking room.
+        (is-serving-room ?room - room); The room is the serving room.
+        (is-preparation-room ?room - room); The room is the preparation room.
+        (is-dishwashing-room ?room - room); The room is the dishwashing room.
+        (is-cutting-room ?room - room); The room is the cutting room.
+        (is-mixing-room ?room - room); The room is the mixing room.
 
-        ; Ordering predicate
-        (has-priority-over ?d1 ?d2 - dish)
+        ;; Helpers to bind specific items to rooms
+        (tool-use-room ?tool -tool ?room -room); A tool is used in a specific room.
+        (ingredient-prep-room ?ingredient - ingredient ?room - room); Ingredient must be prepared in a specific room.
+
+        ;; Requirements between dishes and ingredients (define recipe)
+        (ingredient-used-in-dish ?ingredient - ingredient ?dish - dish) ;; Link ingredient to a specific dish
+        (require-prepared ?dish - dish ?ingredient - ingredient); The dish requires a prepared ingredient.
+        (require-cooked ?dish - dish ?ingredient - ingredient); The dish requires a cooked ingredient.
+        (next-dish ?dish - dish); The dish is currently being cooked
     )
 
+    ; Actions
+
+    ; The robot moves from its current room to an adjacent one.
     (:action move
-        :parameters (?r - robot ?from ?to - location)
+        :parameters (?robot - robot ?from - room ?to - room)
         :precondition (and
-            (robot-at ?r ?from)
+            (at ?robot ?from)
             (adjacent ?from ?to)
-            (or
-                (not (moving-to-serve ?r)) ; Normal movement (no dish is ready to be serve)
-                (is-serving ?to) ; Moving to serve
-                (and ; On path to serving
-                    (exists
-                        (?next - location)
-                        (and
-                            (adjacent ?to ?next)
-                            (is-serving ?next)
-                        )
-                    )
-                )
-            )
         )
         :effect (and
-            (not (robot-at ?r ?from))
-            (robot-at ?r ?to)
+            (at ?robot ?to)
+            (not (at ?robot ?from))
         )
     )
 
+    ;; The robot picks up an item.
     (:action pick-up
-        :parameters (?r - robot ?i - item ?l - location)
+        :parameters (?robot - robot ?item - item ?room - room)
         :precondition (and
-            (robot-at ?r ?l)
-            (item-at ?i ?l)
-            (hand-free ?r)
+            (at ?robot ?room)
+            (at ?item ?room)
+            (hand-free); Verify that the robot does not already hold something (limited to 1).
         )
         :effect (and
-            (not (item-at ?i ?l))
-            (not (hand-free ?r))
-            (holding ?r ?i)
+            (holding ?item)
+            (not (hand-free))
+            (not (at ?item ?room))
         )
     )
 
-    (:action put-down
-        :parameters (?r - robot ?i - item ?l - location)
+    ;; The robot takes an ingredient from the storage.
+    (:action take-from-storage
+        :parameters (?robot - robot ?ingredient - ingredient ?dish - dish ?room - room)
         :precondition (and
-            (robot-at ?r ?l)
-            (holding ?r ?i)
+            (at ?robot ?room)
+            (is-storage-room ?room)
+            (ingredient-stored ?ingredient)
+            (hand-free)
+            (next-dish ?dish)
+            (ingredient-used-in-dish ?ingredient ?dish)
         )
         :effect (and
-            (item-at ?i ?l)
-            (hand-free ?r)
-            (not (holding ?r ?i))
+            (holding ?ingredient)
+            (ingredient-available ?ingredient)
+            (not (hand-free))
+            (not (ingredient-stored ?ingredient))
         )
     )
 
-    (:action cut-ingredient
-        :parameters (?r - robot ?i - ingredient ?t - tool ?l - location)
+    ;; The robot buys an ingredient.
+    (:action buy-ingredient
+        :parameters (?robot - robot ?ingredient - ingredient ?room - room)
         :precondition (and
-            (robot-at ?r ?l)
-            (is-cutting ?l)
-            (holding ?r ?t)
-            (is-cutting-tool ?t)
-            (tool-clean ?t)
-            (item-at ?i ?l)
-            (ingredient-need-cutting ?i)
+            (at ?robot ?room)
+            (is-storage-room ?room)
+            (not (ingredient-stored ?ingredient))
+            (not (ingredient-available ?ingredient))
         )
         :effect (and
-            (ingredient-cut ?i)
-            (not (tool-clean ?t))
+            (ingredient-stored ?ingredient)
         )
     )
 
-    (:action mix-ingredient
-        :parameters (?r - robot ?i - ingredient ?t - tool ?l - location)
+    ;; The robot drops a tool in its use room.
+    (:action drop-tool
+        :parameters (?robot - robot ?tool - tool ?room - room)
         :precondition (and
-            (robot-at ?r ?l)
-            (is-mixing ?l)
-            (holding ?r ?t)
-            (is-mixing-tool ?t)
-            (tool-clean ?t)
-            (item-at ?i ?l)
-            (ingredient-need-mixing ?i)
+            (at ?robot ?room)
+            (holding ?tool)
+            (tool-use-room ?tool ?room)
         )
         :effect (and
-            (ingredient-mixed ?i)
-            (not (tool-clean ?t))
+            (not (holding ?tool))
+            (hand-free)
+            (at ?tool ?room)
         )
     )
 
+    ;; The robot drops an ingredient in a room, which can only be the prep room of the ingredient or the preparation room.
+    (:action drop-ingredient
+        :parameters (?robot - robot ?ingredient - ingredient ?room - room)
+        :precondition (and
+            (at ?robot ?room)
+            (holding ?ingredient)
+            (or
+                (ingredient-prep-room ?ingredient ?room)
+                (is-preparation-room ?room)
+            )
+        )
+        :effect (and
+            (not (holding ?ingredient))
+            (hand-free)
+            (at ?ingredient ?room)
+        )
+    )
+
+    ;; The robot prepares an ingredient (e.g., cuts, mixes) in the appropriate room.
+    (:action prepare-ingredient
+        :parameters (?robot - robot ?ingredient - ingredient ?tool -tool ?room - room)
+        :precondition (and
+            (at ?robot ?room)
+            (ingredient-prep-room ?ingredient ?room); The ingredient must be prepared in the specified room.
+            (at ?ingredient ?room); The robot must hold the ingredient to prepare it.
+            (holding ?tool)
+            (tool-use-room ?tool ?room)
+            (tool-clean ?tool)
+        )
+        :effect (and
+            (ingredient-prepared ?ingredient)
+            (not (tool-clean ?tool))
+        )
+    )
+
+    ;; The robot cooks an ingredient in the cooking area.
     (:action cook-ingredient
-        :parameters (?r - robot ?i - ingredient ?l - location)
+        :parameters (?robot - robot ?ingredient - ingredient ?room - room)
         :precondition (and
-            (robot-at ?r ?l)
-            (is-cooking ?l)
-            (item-at ?i ?l)
-            (ingredient-need-cooking ?i)
+            (is-cooking-room ?room)
+            (at ?robot ?room)
+            (ingredient-prepared ?ingredient); The ingredient must be prepared before cooking.
+            (holding ?ingredient); The robot must hold the ingredient to cook it.
         )
-        :effect (ingredient-cooked ?i)
+        :effect (and
+            (ingredient-cooked ?ingredient)
+        )
     )
 
-    (:action clean-tool
-        :parameters (?r - robot ?t - tool ?l - location)
+    ;; The robot assembles a dish from prepared ingredients in the preparation area.
+    (:action assemble-dish
+        :parameters (?r - robot ?dish - dish ?room - room)
         :precondition (and
-            (robot-at ?r ?l)
-            (is-dishwashing ?l)
-            (holding ?r ?t)
-            (not (tool-clean ?t))
-        )
-        :effect (tool-clean ?t)
-    )
-
-    (:action prepare-dish
-        :parameters (?r - robot ?d - dish ?prep - location)
-        :precondition (and
-            (robot-at ?r ?prep)
-            (is-preparation ?prep)
-            (not (moving-to-serve ?r)) ; Not already serving something
-            ; Check that all higher priority dishes are already served
+            (at ?r ?room)
+            (is-preparation-room ?room)
+            ;; Precondition to ensure all ingredients are either prepared or cooked as required
             (forall
-                (?d2 - dish)
-                (imply
-                    (has-priority-over ?d2 ?d)
-                    (dish-served ?d2)
+                (?ingredient - ingredient)
+                (and
+                    (imply
+                        (and (ingredient-used-in-dish ?ingredient ?dish) (require-prepared ?dish ?ingredient))
+                        (and (ingredient-prepared ?ingredient) (at ?ingredient ?room)))
+                    (imply
+                        (and (ingredient-used-in-dish ?ingredient ?dish) (require-cooked ?dish ?ingredient))
+                        (and (ingredient-cooked ?ingredient) (at ?ingredient ?room)))
                 )
             )
-            ; Check all ingredients are ready in prep area
+        )
+        :effect (and
+            (dish-prepared ?dish)
+            (at ?dish ?room)
             (forall
-                (?i - ingredient)
-                (imply
-                    (ingredient-for ?i ?d)
+                (?ingredient - ingredient)
+                (when
+                    (ingredient-used-in-dish ?ingredient ?dish)
                     (and
-                        (item-at ?i ?prep)
-                        (or (not (ingredient-need-cutting ?i)) (ingredient-cut ?i))
-                        (or (not (ingredient-need-mixing ?i)) (ingredient-mixed ?i))
-                        (or (not (ingredient-need-cooking ?i)) (ingredient-cooked ?i))
+                        (not (ingredient-available ?ingredient))
+                        (not (at ?ingredient ?room))
+                        (not (ingredient-cooked ?ingredient))
+                        (not (ingredient-prepared ?ingredient))
                     )
                 )
             )
         )
-        :effect (and
-            (dish-ready ?d)
-            (moving-to-serve ?r) ; Robot must now move to serving area
-        )
     )
 
+    ;; The robot serves the finished dish in the serving area.
     (:action serve-dish
-        :parameters (?r - robot ?d - dish ?serve - location)
+        :parameters (?robot - robot ?room - room ?dish - dish)
         :precondition (and
-            (robot-at ?r ?serve)
-            (is-serving ?serve)
-            (dish-ready ?d)
-            (moving-to-serve ?r)
+            (is-serving-room ?room)
+            (at ?robot ?room)
+            (holding ?dish)
+            (dish-prepared ?dish)
+            (next-dish ?dish)
+            (forall
+                (?other_dish - dish)
+                (imply
+                    (prioritize-dish ?other_dish ?dish)
+                    (dish-served ?other_dish))
+            )
         )
         :effect (and
-            (dish-served ?d)
-            (not (dish-ready ?d))
-            (not (moving-to-serve ?r)) ; Robot can now do other tasks
+            (dish-served ?dish)
+            (not (holding ?dish))
+            (hand-free)
+            (not (next-dish ?dish))
+            (forall
+                (?other_dish - dish)
+                (when
+                    (prioritize-dish ?dish ?other_dish)
+                    (next-dish ?other_dish)
+                )
+            )
         )
     )
 
+    ;; The robot cleans a tool in the dishwashing area.
+    (:action clean-tool
+        :parameters (?robot -robot ?tool - tool ?room - room)
+        :precondition (and
+            (at ?robot ?room)
+            (is-dishwashing-room ?room)
+            (holding ?tool)
+            (not (tool-clean ?tool))
+        )
+        :effect (and
+            (tool-clean ?tool)
+        )
+    )
 )

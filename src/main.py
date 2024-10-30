@@ -1,33 +1,9 @@
 import os
 import subprocess
-from InquirerPy import prompt
 
 
-def list_planners():
-    return [
-        "dual-bfws-ffparser",
-        "ff",
-        "downward",
-        # TODO: other planners
-    ]
-
-
-def find_pddl_problems(src_path):
-    problems = []
-    for entry in os.scandir(src_path):
-        if entry.is_dir():
-            problem_path = os.path.join(entry.path, "problem.pddl")
-            if os.path.isfile(problem_path):
-                problems.append(entry.name)
-    return problems
-
-
-def run_planner(planner, domain_file, problem_file, output_file):
-
-    if planner == "enhsp":
-        command = ["planutils", "run", planner, "-o", domain_file, "-f", problem_file]
-    else:
-        command = ["planutils", "run", planner, domain_file, problem_file]
+def run_planner(domain_file, problem_file, output_file):
+    command = ["planutils", "run", "dual-bfws-ffparser", domain_file, problem_file]
 
     try:
         with open(output_file, "w") as f:
@@ -57,44 +33,27 @@ def run_planner(planner, domain_file, problem_file, output_file):
 
 def main():
     src_path = os.path.dirname(os.path.abspath(__file__))
-    planners = list_planners()
-    problems = find_pddl_problems(src_path)
+    domain_file = os.path.join(src_path, "domain.pddl")
 
-    if not problems:
-        print("No directories with problem.pddl files found in the src folder.")
-        return
-
-    problems.sort(reverse=False)
-
-    questions = [
-        {
-            "type": "list",
-            "name": "planner",
-            "message": "Select a planner",
-            "choices": planners,
-        },
-        {
-            "type": "list",
-            "name": "problem",
-            "message": "Select a problem (directory containing problem.pddl)",
-            "choices": problems,
-        },
+    # Find all problem files
+    problem_files = [
+        f
+        for f in os.listdir(src_path)
+        if f.startswith("problem") and f.endswith(".pddl")
     ]
 
-    answers = prompt(questions)
-    selected_planner = answers["planner"]
-    selected_problem = answers["problem"]
-    domain_file = os.path.join(src_path, "domain.pddl")
-    problem_file = os.path.join(src_path, selected_problem, "problem.pddl")
-    output_file = os.path.join(
-        src_path, selected_problem, f"{selected_planner}_output.txt"
-    )
-    output_file = os.path.join(
-        src_path, selected_problem, f"{selected_planner}_output.txt"
-    )
+    if not problem_files:
+        print("No problem files found in the src folder.")
+        return
 
-    print(f"Running planner '{selected_planner}' on problem '{selected_problem}'...")
-    run_planner(selected_planner, domain_file, problem_file, output_file)
+    for problem_file in problem_files:
+        problem_path = os.path.join(src_path, problem_file)
+        output_file = os.path.join(
+            src_path, f"{problem_file[:-5]}_dual-bfws-ffparser_output.txt"
+        )
+
+        print(f"Running dual-bfws-ffparser on {problem_file}...")
+        run_planner(domain_file, problem_path, output_file)
 
 
 if __name__ == "__main__":

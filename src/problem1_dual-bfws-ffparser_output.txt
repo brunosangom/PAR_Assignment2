@@ -1,0 +1,8 @@
+Command execution completed.
+
+Planner Output:
+---------------
+
+ff: goal can be simplified to FALSE. No plan will solve it
+
+
