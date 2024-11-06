@@ -34,7 +34,7 @@
         (require-prepared sushi fish)
         (require-cooked sushi rice)
 
-        ;; Set sushi as the next dish to prepare (uncommented this line)
+        ;; Set sushi as the next dish to prepare
         (next-dish sushi)
 
         ;; Set each room with a predicate
